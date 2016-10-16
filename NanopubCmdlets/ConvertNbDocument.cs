@@ -51,6 +51,8 @@ namespace NanopubCmdlets
         {
             string tagText = "";
             string tag = "";
+            int i = 0;
+            int subTopicCount = 0;
 
             try
             {
@@ -71,7 +73,6 @@ namespace NanopubCmdlets
                 nanobook = new wdNanobook();
 
                 WordprocessingDocument wdDoc = WordprocessingDocument.Open(path, false);
-                int i = 0;
                 foreach (Paragraph para in wdDoc.MainDocumentPart.Document.Body.Descendants<Paragraph>())
                 {
                     i++;
@@ -98,9 +99,19 @@ namespace NanopubCmdlets
                                 }
                             case "topic":
                                 nanobook.DocumentXml += "<topic>";
+
+                                break;
+                            case "subtopic":
+                                nanobook.DocumentXml += "<topic>";
+                                subTopicCount++;
+                              
                                 break;
                             case "para":
                                 nanobook.DocumentXml += "<para>";
+
+                                break;
+                            case "example":
+                                nanobook.DocumentXml += "<example>";
 
                                 break;
                             default:

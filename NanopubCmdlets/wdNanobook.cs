@@ -13,5 +13,7 @@ namespace NanopubCmdlets
         public string Author { get; set; }
         public string DocumentXml { get; set; }
 
+        public int SubTopicCount { get; set; }
+
     }
 }

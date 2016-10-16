@@ -50,11 +50,13 @@
   <ItemGroup>
     <Compile Include="ConvertNbDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransformNbDocument.cs" />
     <Compile Include="wdNanobook.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assemblies\DocumentFormat.OpenXml.dll" />
     <Content Include="Assemblies\System.Management.Automation.dll" />
+    <EmbeddedResource Include="Nanobook1.xslt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NB_PS1003_Azure.docx">
