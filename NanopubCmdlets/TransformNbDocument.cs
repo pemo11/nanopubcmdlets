@@ -11,7 +11,7 @@ using System.Management.Automation;
 
 namespace NanopubCmdlets
 {
-    [Cmdlet("Transform", "Document")]
+    [Cmdlet("Transform", "NbDocument")]
     public class TransformNbDocument : PSCmdlet
     {
         private string path;
@@ -32,26 +32,42 @@ namespace NanopubCmdlets
         {
             string xmlText = "";
             string htmlText = "";
-            using (IO.StreamReader sr = new IO.StreamReader(path))
+            try
             {
-                xmlText = sr.ReadToEnd();
+                using (IO.StreamReader sr = new IO.StreamReader(path))
+                {
+                    xmlText = sr.ReadToEnd();
+                }
             }
-            XslCompiledTransform xslTransform = new XslCompiledTransform();
-            IO.Stream stXsl = Assembly.GetExecutingAssembly().GetManifestResourceStream("NanopubCmdlets.Resources.Nanobook1.xslt");
-            IO.StreamReader srXsl = new IO.StreamReader(stXsl);
-            XmlReader xmlReader = XmlReader.Create(srXsl);
-            xslTransform.Load(xmlReader);
-            IO.StringReader srXml = new IO.StringReader(xmlText);
-            XmlReader xrXml = XmlReader.Create(srXml);
-            IO.MemoryStream ms = new IO.MemoryStream();
-            XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
-            xmlWriterSettings.OmitXmlDeclaration = true;
-            XmlWriter xwXml = XmlWriter.Create(ms, xmlWriterSettings);
-            xslTransform.Transform(xrXml, xwXml);
-            ms.Position = 0;
-            IO.StreamReader srHtml = new IO.StreamReader(ms);
-            htmlText = srHtml.ReadToEnd();
-            WriteObject(htmlText);
+            catch (SystemException ex)
+            {
+                ErrorRecord err = new ErrorRecord(ex, "TransformNbDocument.ReadXml", ErrorCategory.InvalidOperation, null);
+                WriteError(err);
+            }
+            try
+            {
+                XslCompiledTransform xslTransform = new XslCompiledTransform();
+                IO.Stream stXsl = Assembly.GetExecutingAssembly().GetManifestResourceStream("NanopubCmdlets.Nanobook1.xslt");
+                IO.StreamReader srXsl = new IO.StreamReader(stXsl);
+                XmlReader xmlReader = XmlReader.Create(srXsl);
+                xslTransform.Load(xmlReader);
+                IO.StringReader srXml = new IO.StringReader(xmlText);
+                XmlReader xrXml = XmlReader.Create(srXml);
+                IO.MemoryStream ms = new IO.MemoryStream();
+                XmlWriterSettings xmlWriterSettings = new XmlWriterSettings();
+                xmlWriterSettings.OmitXmlDeclaration = true;
+                XmlWriter xwXml = XmlWriter.Create(ms, xmlWriterSettings);
+                xslTransform.Transform(xrXml, xwXml);
+                ms.Position = 0;
+                IO.StreamReader srHtml = new IO.StreamReader(ms);
+                htmlText = srHtml.ReadToEnd();
+                WriteObject(htmlText);
+            }
+            catch (SystemException ex)
+            {
+                ErrorRecord err = new ErrorRecord(ex, "TransformNbDocument.XslTransform", ErrorCategory.InvalidOperation, null);
+                WriteError(err);
+            }
         }
     }
 }

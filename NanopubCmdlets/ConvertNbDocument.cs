@@ -10,22 +10,40 @@ using DocumentFormat.OpenXml.Packaging;
 
 namespace NanopubCmdlets
 {
-    [Cmdlet("Convert", "NbDocument")]
+    [Cmdlet("Convert", "NbDocument", DefaultParameterSetName="Standard")]
     public class ConvertNbDocument : PSCmdlet
     {
         private string path;
+        private string xmlPath;
         private wdNanobook nanobook;
 
         [Alias("Fullname")]
         [Parameter(HelpMessage = "Der Pfad der Docx-Datei",
             Mandatory = true,
-            ValueFromPipelineByPropertyName = true)]
+            ValueFromPipelineByPropertyName = true)
+        ]
+
+       
+        // Pfad der Docx-Datei    
         public string Path
         {
             get { return path; }
             set
             {
                 path = value;
+            }
+        }
+
+        // Pfad der Xml-Ausgabedatei    
+        [Parameter(HelpMessage = "Der Pfad der Xml-Ausgabedatei",
+            ParameterSetName = "Xml")
+        ]
+        public string XmlPath
+        {
+            get { return xmlPath; }
+            set
+            {
+                xmlPath = value;
             }
         }
 
@@ -102,7 +120,7 @@ namespace NanopubCmdlets
 
                                 break;
                             case "subtopic":
-                                nanobook.DocumentXml += "<topic>";
+                                nanobook.DocumentXml += "<subtopic>";
                                 subTopicCount++;
                               
                                 break;
@@ -138,6 +156,23 @@ namespace NanopubCmdlets
                 }
                 WriteObject(nanobook);
                 wdDoc.Close();
+                // Als Datei speichern?
+                if (xmlPath != "")
+                {
+                    byte[] xmlBytes = System.Text.Encoding.Default.GetBytes(nanobook.DocumentXml);
+                    try
+                    {
+                        using (IO.FileStream fs = new IO.FileStream(xmlPath, IO.FileMode.CreateNew))
+                        {
+                            fs.Write(xmlBytes, 0, xmlBytes.Length);
+                        }
+                    }
+                    catch (SystemException ex)
+                    {
+                        ErrorRecord errRecord = new ErrorRecord(ex, "ConvertNpDocument.XmlSpeichern", ErrorCategory.InvalidOperation, null);
+                        WriteError(errRecord);
+                    }
+                }
             }
             catch (SystemException ex)
             {
